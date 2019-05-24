@@ -68,10 +68,31 @@ def append_csv(part):
 # see netlist_reader.py for more info
 grouped = net.groupComponents()
 
-xls = openpyxl.load_workbook(xlsfile)
+
+def init_BOM_sheet(xls):
+    sheet = xls['BOM']
+    sheet.insert_rows(1)
+    headers = ['Sync'] + header_names
+    for i, col in enumerate(headers):
+        col_no = i + 1
+        cell = sheet.cell(column=col_no, row=1)
+        cell.value = col
+        cell.font = cell.font.copy(bold=True)
+
+try:
+    xls = openpyxl.load_workbook(xlsfile)
+
+# Create a new empty sheet with only the headers.
+# The rest of the sync process will add all the data
+except FileNotFoundError:
+    xls = openpyxl.Workbook()
+    xls.active.title = 'BOM'
+    init_BOM_sheet(xls)
+
 if not 'BOM' in xls:
-    print("ERROR: xls file {} does not contain a 'BOM' worksheet".format(xlsfile))
-    sys.exit()
+    print("WARNING: xls file {} did not contain a 'BOM' worksheet, adding new sheet..".format(xlsfile))
+    xls.create_sheet('BOM')
+    init_BOM_sheet(xls)
 
 # Build a lookup from column header -> column index
 sheet = xls['BOM']
@@ -162,16 +183,13 @@ def update_xls(part):
                 row[col_index].fill = changed_fill
                 row[col_index].value = new_value
         last_updated_row = row[0].row
-        print("ROW:", last_updated_row)
         return
 
     # No matching row was found: insert a new one
     print("New component found with value='{}', "
             "footprint '{}':".format(part['Value'], part['Footprint']))
     last_updated_row+=1
-    print("INSERT @", last_updated_row)
     sheet.insert_rows(last_updated_row)
-    print("ROW:", last_updated_row)
     for prop in part:
         new_value = str(part[prop]).strip()
 
@@ -217,6 +235,10 @@ for group in grouped:
     part['Farnell'] = c.getField("Farnell")
     part['Mouser'] = c.getField("Mouser")
 
+    # Avoid whitespace mismatch
+    for prop in part:
+        part[prop] = str(part[prop]).strip()
+
     append_csv(part)
     update_xls(part)
 
@@ -234,7 +256,9 @@ if 'Sync' in col_lookup:
             fp = sheet.cell(column=col_lookup['Footprint']+1, row=row_no).value
             if val or fp:
                 
-                print("OBSOLETE:", val, fp)
+                print("Obsolete component found with value='{}', "
+                        "footprint '{}':".format(val, fp))
+
                 cell.fill = obsolete_fill
 
 xls.save(filename=xlsfile)
