@@ -1,0 +1,6 @@
+__pychache__
+*.pyc
+.~lock*
+*.bak
+*.csv
+*.xlsx
