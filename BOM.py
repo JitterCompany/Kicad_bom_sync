@@ -237,6 +237,10 @@ for group in grouped:
     for prop in part:
         part[prop] = str(part[prop]).strip()
 
+    # Skip 'Do Not Place' parts
+    if part['Value'] == 'DNI' or part['Value'] == 'DNP':
+        continue
+
     append_csv(part)
     update_xls(part)
 
