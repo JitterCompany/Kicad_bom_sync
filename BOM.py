@@ -104,7 +104,6 @@ while(True):
     if val is None:
         break
     col_lookup[val] = (col - 1)
-print(col_lookup)
 
 if not 'Value' in col_lookup or not 'Footprint' in col_lookup:
     print("ERROR: xls file {} does not have 'Value' and 'Footprint' colums".format(xlsfile))
@@ -129,7 +128,6 @@ none_fill = openpyxl.styles.fills.PatternFill(patternType=None)
 
 ## XLS: prepare by clearing the sync column
 if 'Sync' in col_lookup:
-    print("Clearing 'Sync' flags")
     col_no = col_lookup['Sync']+1
     for r in range(sheet.max_row)[1:]:
         row_no = r+1
