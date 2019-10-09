@@ -31,3 +31,9 @@ Components are grouped by value and footprint:
 * No matching component (matching value + footprint) found? A new row is added and marked green.
 * If the sheet has a column called 'Sync' (optional but highly recommended),
 this is updated to '1' for matched components, or marked red for obsolete.
+
+# Dependencies
+
+This script requires the following packages:
+
+* openpyxl (>= 2.4): `pip install openpyxl`
