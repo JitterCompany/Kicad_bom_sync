@@ -238,8 +238,9 @@ for group in grouped:
         part[prop] = str(part[prop]).strip()
 
     # Skip 'Do Not Place' parts
-    if part['Value'] == 'DNI' or part['Value'] == 'DNP':
+    if part['Value'] in ['DNI', 'DNP', 'LOGO', 'mousebite', 'inf']:
         continue
+
 
     append_csv(part)
     update_xls(part)
