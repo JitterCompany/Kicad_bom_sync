@@ -232,6 +232,7 @@ for group in grouped:
     part['MPN'] = c.getField("MPN")
     part['Farnell'] = c.getField("Farnell")
     part['Mouser'] = c.getField("Mouser")
+    part['DNI'] = c.getField("DNI")
 
     # Avoid whitespace mismatch
     for prop in part:
@@ -240,6 +241,11 @@ for group in grouped:
     # Skip 'Do Not Place' parts
     if part['Value'] in ['DNI', 'DNP', 'LOGO', 'mousebite', 'inf']:
         continue
+    if part['Value'].startswith('DNI'):
+        continue
+    if part['DNI']:
+        continue
+
 
 
     append_csv(part)
