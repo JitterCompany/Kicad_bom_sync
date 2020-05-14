@@ -186,8 +186,18 @@ def update_xls(part):
     # No matching row was found: insert a new one
     print("New component found with value='{}', "
             "footprint '{}':".format(part['Value'], part['Footprint']))
+
     last_updated_row+=1
-    sheet.insert_rows(last_updated_row)
+
+    if len(list(sheet.rows)) < last_updated_row:
+        # Append new row to sheet by writing a dummy value
+        # (dummy value is overwritten, but forces sheet.rows[i] to exist)
+        sheet.cell(row=last_updated_row,column=1).value='dummy'
+    else:
+        # Insert new row before given index
+        sheet.insert_rows(last_updated_row)
+
+
     for prop in part:
         new_value = str(part[prop]).strip()
 
