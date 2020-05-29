@@ -15,12 +15,16 @@
     bom generators or netlists in foreign format
 """
 
-
 from __future__ import print_function
 import sys
 import xml.sax as sax
 import re
 import pdb
+
+from translate_fp import translate_fp
+from compare_SI import compare_SI
+from functools import cmp_to_key
+
 
 #-----<Configure>----------------------------------------------------------------
 
@@ -334,7 +338,7 @@ class comp():
         """
         result = False
         if self.getValue() == other.getValue():
-            if self.getFootprint() == other.getFootprint():
+            if translate_fp(self.getFootprint()) == translate_fp(other.getFootprint()):
                 result = True
         return result
 
@@ -664,13 +668,60 @@ class netlist():
         # to get them in order as this makes for easier to read BOM's
         def f(v):
             return re.sub(r'([A-z]+)[0-9]+', r'\1', v) + '%08i' % int(re.sub(r'[A-z]+([0-9]+)', r'\1', v))
+
+        sorted_groups = []
         for g in groups:
             g = sorted(g, key=lambda g: f(g.getRef()))
+            sorted_groups.append(g)
 
         # Finally, sort the groups to order the references alphabetically
-        groups = sorted(groups, key=lambda group: f(group[0].getRef()))
+       # sorted_groups = sorted(sorted_groups, key=lambda group: f(group[0].getRef()))
 
-        return groups
+        ref_prefix_regex = re.compile('(^[^0-9]+)([0-9]+)')
+
+
+        def _custom_compare(a, b):
+            """
+            Compare footprints based on ref + value, use for sorting
+
+            Components are compared based on the reference prefix: C1 sorts before R1."
+            Components with the same reference prefix are sorted based on the SI-suffixed
+            values: 18pF sorts before 4nF
+            """
+            a = a[0]
+            b = b[0]
+
+            match_a = ref_prefix_regex.match(a.getRef())
+            match_b = ref_prefix_regex.match(b.getRef())
+
+            if match_a is None or match_b is None:
+                # Unexpected: a reference that does not match the regex.
+                # Fall back to alphabetical sorting
+                if a == b:
+                    return 0
+                return -1 if (a < b) else 1
+
+
+            prefix_a = match_a.group(1)
+            prefix_b = match_b.group(1)
+
+            value_a = a.getValue()
+            value_b = b.getValue()
+
+            # Same 'type' of components based on the ref prefix (e.g. both 'C' or both 'R').
+            # Sub-sort these based on component values
+            if prefix_a == prefix_b:
+                print("CMP based on SI: {}.{}  {},{}".format(prefix_a, value_a, prefix_b, value_b))
+
+                return compare_SI(value_a, value_b)
+
+            # Different 'type' of component: just sort on ref prefix
+            return -1 if (prefix_a < prefix_b) else 1
+
+
+        sorted_groups = sorted(sorted_groups, key=cmp_to_key(_custom_compare))
+
+        return sorted_groups
 
     def getGroupField(self, group, field):
         """Return the whatever is known about the given field by consulting each

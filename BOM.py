@@ -17,12 +17,14 @@
 
 # Import the KiCad python helper module and the csv formatter
 import netlist_reader
+from translate_fp import translate_fp
 import csv
 import openpyxl
 import sys
 
-if not len(sys.argv) == 3:
-    print("Command line:\npython \"pathToFile/BOM.py\" \"%I\" \"%O\"")
+if not len(sys.argv) >= 3:
+    print("Command line:\npython \"pathToFile/BOM.py\" bom-from-KiCad.xml generated-bom-xlsx-file")
+    print("Command line (from KiCad):\npython \"pathToFile/BOM.py\" \"%I\" \"%O\"")
     sys.exit()
 
 # Generate an instance of a generic netlist, and load the netlist tree from
@@ -119,6 +121,10 @@ new_fill = openpyxl.styles.fills.PatternFill(patternType='solid', fgColor=new_co
 changed_color = openpyxl.styles.colors.Color(rgb='00FFF200')
 changed_fill = openpyxl.styles.fills.PatternFill(patternType='solid', fgColor=changed_color)
 
+# Translated content (e.g. simplfied footprint name)
+translate_color = openpyxl.styles.colors.Color(rgb='007DF2E6')
+translate_fill = openpyxl.styles.fills.PatternFill(patternType='solid', fgColor=translate_color)
+
 # Obsolete part: part is not in the Kicad design anymore
 obsolete_color = openpyxl.styles.colors.Color(rgb='00F20000')
 obsolete_fill = openpyxl.styles.fills.PatternFill(patternType='solid', fgColor=obsolete_color)
@@ -150,7 +156,7 @@ def update_xls(part):
         xls_fp = row[col_lookup['Footprint']].value
 
         # Not the right row: skip
-        if not xls_val == part['Value'] or not xls_fp == part['Footprint']:
+        if not xls_val == part['Value'] or not translate_fp(xls_fp) == translate_fp(part['Footprint']):
             continue
 
         # Matching row found: mark it as 'in sync'
@@ -161,6 +167,9 @@ def update_xls(part):
         first_change = True
         for prop in part:
             new_value = str(part[prop]).strip()
+
+            if prop == 'Footprint':
+                new_value = translate_fp(new_value)
 
             # no value is set: skip
             if not new_value:
@@ -178,7 +187,15 @@ def update_xls(part):
                     print("Change(s) found for component with value='{}', "
                             "footprint '{}':".format(xls_val, xls_fp))
                 print("'{}' changed from '{}' to '{}'".format(prop, old_value, new_value))
-                row[col_index].fill = changed_fill
+
+                # This can only be because of changes in translation,
+                # otherwise this row would not have matched
+                if prop == 'Footprint':
+                    print("Translated")
+                    row[col_index].fill = translate_fill
+                else:
+                    row[col_index].fill = changed_fill
+
                 row[col_index].value = new_value
         last_updated_row = row[0].row
         return
@@ -210,6 +227,10 @@ def update_xls(part):
             continue
 
         row = list(sheet.rows)[last_updated_row-1]
+
+        # Footprint is 'special': translate it to more readable format
+        if prop == 'Footprint':
+            new_value = translate_fp(new_value)
 
         # update property
         col_index = col_lookup[prop]

@@ -21,7 +21,6 @@ You can accept incoming changes by simply removing the highlight and then saving
 Clone this repository and install the required python package(s):
 
 * openpyxl (>= 2.4): `pip install openpyxl`
-* (this comes with KiCad) kicad_netlist_reader: `pip install kicad_netlist_reader`)
 
 
 ## (Optional) install as KiCad plugin
@@ -69,6 +68,10 @@ Components are grouped by value and footprint:
 * No matching component (matching value + footprint) found? A new row is added and marked green.
 * If the sheet has a column called 'Sync' (optional but highly recommended),
 this is updated to '1' for matched components, or marked red for obsolete rows.
+
+### Update: automatic footprint renaming
+Since V0.5 the Kicad Footprint names are translated to simplify them. For example, the name of the footprint library is omitted and underscores are replaced with whitespace.
+The script is backwards compatible with old BOMs, and will highlight renamed footprints in blue.
 
 ### Reviewing the changes
 
