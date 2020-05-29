@@ -102,6 +102,10 @@ properties in a KiCad component:
 - Set its value to 'DNI', 'DNP', LOGO', 'mousebite' or 'inf'
 - Add a 'DNI' field and set it to '1'
 
+### Sorting order
+
+Upon creation of the BOM, the lines are sorted based on component reference + value. For example, all capacitors (reference 'C') are in adjacent rows, sorted by value. The sorting understands SI-suffix, so pF, nF, uF etc should sort as expected.
+The BOM is intentionally not re-sorted when syncing. This enables you to manually adjust the sorting order.
 
 ### Two way sync?
 
