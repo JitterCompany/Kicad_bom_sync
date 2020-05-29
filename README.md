@@ -1,11 +1,11 @@
-# Kicad BOM Sync
+# KiCad BOM Sync
 KiCad BOM plugin that syncs changes from KiCad to a spreadsheet.
 
 ## Concept
 Most BOM tools simply export to CSV or XLSX. You would then manually edit the spreadsheet
 (adding component price info, manufacturers, style, etc). But what if you then make changes to the design?
 
-### Review changes from KiCAD
+### Review changes from KiCad
 This tool can not only create, but also update an existing XLSX spreadsheet with changes from KiCad.
 It is basically a diff tool for the BOM: it highlights all changes that were made.
 Obsolete entries are highligted in red instead of silently deleting them: this allows you to review for unexpected BOM cchanges.
