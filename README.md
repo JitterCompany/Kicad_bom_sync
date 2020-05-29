@@ -87,6 +87,19 @@ This plugin always sees data from KiCad as the absolute truth: while you are fre
 * If the component has no `MPN` field (or it is empty) in KiCad: the BOM remains unchanged (your manual edit remains)
 * If the component does have its `MPN` field specified: the BOM is updated with the value from KiCad (and highlighted yellow)
 
+
+## Advanced features
+
+
+### DNI: exclude parts from the BOM
+
+You can exclude certain parts from the BOM by setting one of the following
+properties in a KiCad component:
+- Set its value to anything starting with 'DNI'
+- Set its value to 'DNI', 'DNP', LOGO', 'mousebite' or 'inf'
+- Add a 'DNI' field and set it to '1'
+
+
 ### Two way sync?
 
 Unfortunately, syncing back changes from the BOM to the KiCad schematics is not supported (yet?). Terefore, the recommended workflow is to enter part information (such as MPN) in KiCad first, then sync it to the BOM.
