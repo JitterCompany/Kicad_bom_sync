@@ -677,7 +677,7 @@ class netlist():
         # Finally, sort the groups to order the references alphabetically
        # sorted_groups = sorted(sorted_groups, key=lambda group: f(group[0].getRef()))
 
-        ref_prefix_regex = re.compile('(^[^0-9]+)([0-9]+)')
+        ref_prefix_regex = re.compile('(^.*[^0-9]+)([0-9]+)')
 
 
         def _custom_compare(a, b):
