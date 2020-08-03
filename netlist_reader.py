@@ -711,7 +711,6 @@ class netlist():
             # Same 'type' of components based on the ref prefix (e.g. both 'C' or both 'R').
             # Sub-sort these based on component values
             if prefix_a == prefix_b:
-                print("CMP based on SI: {}.{}  {},{}".format(prefix_a, value_a, prefix_b, value_b))
 
                 return compare_SI(value_a, value_b)
 
