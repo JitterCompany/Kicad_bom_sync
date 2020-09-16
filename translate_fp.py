@@ -15,6 +15,8 @@ def translate_fp(fp_string):
     correctly group parts based on them
     """
 
+    if not fp_string:
+        return ""
 
     result = fp_string
 
