@@ -148,6 +148,9 @@ def update_xls(part):
             if prop == 'Footprint':
                 new_value = translate_fp(new_value)
 
+            if prop == 'Qty':
+                new_value = int(new_value)
+
             # no value is set: skip
             if not new_value:
                 continue
@@ -158,7 +161,7 @@ def update_xls(part):
 
             col_index = col_lookup[prop]
             old_value = str(row[col_index].value).strip()
-            if not old_value == new_value:
+            if not old_value == str(new_value):
                 if first_change:
                     first_change = False
                     print("Change(s) found for component with value='{}', "
@@ -208,6 +211,9 @@ def update_xls(part):
         # Footprint is 'special': translate it to more readable format
         if prop == 'Footprint':
             new_value = translate_fp(new_value)
+
+        if prop == 'Qty':
+            new_value = int(new_value)
 
         # update property
         col_index = col_lookup[prop]
