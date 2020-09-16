@@ -12,13 +12,12 @@
     'Ref', 'Qty', 'Value', 'Footprint', 'Description', 'MPN', ...
 
     Command line:
-    python "pathToFile/BOM.py" "%I" "%O.csv"
+    python "pathToFile/BOM.py" "%I" "%O"
 """
 
-# Import the KiCad python helper module and the csv formatter
+# Import the KiCad python helper module and XLS tools
 import netlist_reader
 from translate_fp import translate_fp
-import csv
 import openpyxl
 import sys
 
@@ -33,32 +32,10 @@ net = netlist_reader.netlist(sys.argv[1])
 
 # Open a file to write to, if the file cannot be opened output to stdout
 # instead
-csvfile = sys.argv[2] + '.csv'
 xlsfile = sys.argv[2] + '.xlsx'
-try:
-    f = open(csvfile, 'w')
-except IOError:
-    e = "Can't open output file for writing: " + csvfile
-    print(__file__, ":", e, sys.stderr)
-    sys.exit()
 
-# Create a new csv writer object to use as the output formatter
-out = csv.writer(f, lineterminator='\n', delimiter=',', quotechar='\"', quoting=csv.QUOTE_ALL)
 
-# Output a set of rows for a header providing general information
-#out.writerow(['Source:', net.getSource()])
-#out.writerow(['Date:', net.getDate()])
-#out.writerow(['Tool:', net.getTool()])
-#out.writerow( ['Generator:', sys.argv[0]] )
-#out.writerow(['Component Count:', len(net.components)])
 header_names = ['Ref', 'Qty', 'Value', 'Footprint', 'Description', 'MPN', 'Farnell', 'Mouser']
-out.writerow(header_names)
-
-def append_csv(part):
-    # Fill in the component groups common data
-    #out.writerow([refs, len(group), c.getValue(), c.getFootprint(),
-    #    c.getDescription(), c.getField("MPN"), c.getField('Farnell'), c.getField('Mouser')])
-    out.writerow(list(part.values()))
 
 # Get all of the components in groups of matching value + footprint
 
@@ -279,7 +256,6 @@ for group in grouped:
 
 
 
-    append_csv(part)
     update_xls(part)
 
 
