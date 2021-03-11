@@ -9,7 +9,7 @@
     Generate/update a XLSX BOM.
     Components are sorted by ref and grouped by value with same footprint
     Fields are (if exist)
-    'Ref', 'Qty', 'Value', 'Footprint', 'Description', 'MPN', ...
+    'Ref', 'Qty', 'Value', 'Rating', 'Footprint', 'Description', 'MPN', ...
 
     Command line:
     python "pathToFile/BOM.py" "%I" "%O"
@@ -35,7 +35,7 @@ net = netlist_reader.netlist(sys.argv[1])
 xlsfile = sys.argv[2] + '.xlsx'
 
 
-header_names = ['Ref', 'Qty', 'Value', 'Footprint', 'Description', 'MPN', 'Farnell', 'Mouser']
+header_names = ['Ref', 'Footprint', 'Value', 'Rating', 'Qty', 'MPN', 'Farnell', 'Mouser']
 
 # Get all of the components in groups of matching value + footprint
 
@@ -233,9 +233,22 @@ for group in grouped:
 
     # Add the reference of every component in the group and keep a reference
     # to the component so that the other data can be filled in once per group
+
+    ratings = set()
+
     for component in group:
         refs += component.getRef() + ", "
         c = component
+
+        # Gather all component ratings for this group of components.
+        # All unique ratings are combined into one field in the BOM.
+        # While ordering, a component should be selected that satisfies all of them
+        rating = str(c.getField("Rating") or c.getField("rating")).strip()
+        for r in rating.split(','):
+            if len(r):
+                ratings.add(r)
+
+    ratings = ','.join(list(ratings))
 
     part = {}
     part['Ref'] = refs
@@ -243,6 +256,7 @@ for group in grouped:
     part['Value'] = c.getValue()
     part['Footprint'] = c.getFootprint()
     part['Description'] = c.getDescription()
+    part['Rating'] = ratings
     part['MPN'] = c.getField("MPN")
     part['Farnell'] = c.getField("Farnell")
     part['Mouser'] = c.getField("Mouser")
