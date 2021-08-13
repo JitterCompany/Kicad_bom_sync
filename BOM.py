@@ -248,7 +248,11 @@ for group in grouped:
             if len(r):
                 ratings.add(r)
 
-    ratings = ','.join(list(ratings))
+    # Convert ratings from 'set' to a CSV-string.
+    # Sorting is to guarantee reproducibility
+    ratings = list(ratings)
+    ratings.sort()
+    ratings = ','.join(ratings)
 
     part = {}
     part['Ref'] = refs
