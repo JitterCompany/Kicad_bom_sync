@@ -18,6 +18,8 @@ def translate_fp(fp_string):
     if not fp_string:
         return ""
 
+    if not isinstance(fp_string, str):
+        fp_string = str(fp_string)
     result = fp_string
 
     # Try to remove the library prefix
