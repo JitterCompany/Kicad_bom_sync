@@ -264,7 +264,7 @@ for group in grouped:
     part['MPN'] = c.getField("MPN")
     part['Farnell'] = c.getField("Farnell")
     part['Mouser'] = c.getField("Mouser")
-    part['DNI'] = c.getField("DNI")
+    part['DNI'] = c.getField("DNI") or c.getField("DNP")
 
     # Avoid whitespace mismatch
     for prop in part:
@@ -295,7 +295,7 @@ if 'Sync' in col_lookup:
             val = sheet.cell(column=col_lookup['Value']+1, row=row_no).value
             fp = sheet.cell(column=col_lookup['Footprint']+1, row=row_no).value
             if val or fp:
-                
+
                 print("Obsolete component found with value='{}', "
                         "footprint '{}':".format(val, fp))
 
