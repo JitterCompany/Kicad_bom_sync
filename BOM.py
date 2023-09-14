@@ -45,6 +45,8 @@ header_names = ['Ref', 'Footprint', 'Value', 'Rating', 'Qty', 'MPN', 'Farnell', 
 # in this bom generator script before calling the netliste reader by something like:
 #    net = kicad_netlist_reader.netlist(sys.argv[1])
 # see netlist_reader.py for more info
+
+components = net.components
 grouped = net.groupComponents()
 
 
@@ -236,17 +238,31 @@ for group in grouped:
 
     ratings = set()
 
+    filtered_group = []
     for component in group:
+
+        # Skip DNI parts
+        value = component.getValue().strip()
+        if value.startswith('DNI') or value in ['DNI', 'DNP', 'LOGO', 'mousebite', 'inf']:
+            continue
+        elif component.getField("DNI") or component.getField("DNP"):
+            continue
+
         refs += component.getRef() + ", "
+        filtered_group.append(component)
         c = component
 
         # Gather all component ratings for this group of components.
         # All unique ratings are combined into one field in the BOM.
         # While ordering, a component should be selected that satisfies all of them
-        rating = str(c.getField("Rating") or c.getField("rating")).strip()
+        rating = str(component.getField("Rating") or component.getField("rating")).strip()
         for r in rating.split(','):
             if len(r):
                 ratings.add(r)
+
+    # Skip empty groups
+    if len(refs) <= 0:
+        continue
 
     # Convert ratings from 'set' to a CSV-string.
     # Sorting is to guarantee reproducibility
@@ -256,7 +272,7 @@ for group in grouped:
 
     part = {}
     part['Ref'] = refs
-    part['Qty'] = len(group)
+    part['Qty'] = len(filtered_group)
     part['Value'] = c.getValue()
     part['Footprint'] = c.getFootprint()
     part['Description'] = c.getDescription()
@@ -264,20 +280,10 @@ for group in grouped:
     part['MPN'] = c.getField("MPN")
     part['Farnell'] = c.getField("Farnell")
     part['Mouser'] = c.getField("Mouser")
-    part['DNI'] = c.getField("DNI") or c.getField("DNP")
 
     # Avoid whitespace mismatch
     for prop in part:
         part[prop] = str(part[prop]).strip()
-
-    # Skip 'Do Not Place' parts
-    if part['Value'] in ['DNI', 'DNP', 'LOGO', 'mousebite', 'inf']:
-        continue
-    if part['Value'].startswith('DNI'):
-        continue
-    if part['DNI']:
-        continue
-
 
 
     update_xls(part)
