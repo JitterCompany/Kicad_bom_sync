@@ -35,7 +35,7 @@ net = netlist_reader.netlist(sys.argv[1])
 xlsfile = sys.argv[2] + '.xlsx'
 
 
-header_names = ['Ref', 'Footprint', 'Value', 'Rating', 'Qty', 'MPN', 'Farnell', 'Mouser']
+header_names = ['Ref', 'Footprint', 'Value', 'Rating', 'Qty', 'MPN', 'Farnell', 'Mouser', 'Digikey']
 
 # Get all of the components in groups of matching value + footprint
 
@@ -280,6 +280,7 @@ for group in grouped:
     part['MPN'] = c.getField("MPN")
     part['Farnell'] = c.getField("Farnell")
     part['Mouser'] = c.getField("Mouser")
+    part['Digikey'] = c.getField("Digikey")
 
     # Avoid whitespace mismatch
     for prop in part:
