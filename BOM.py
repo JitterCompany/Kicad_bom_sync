@@ -245,7 +245,7 @@ for group in grouped:
         value = component.getValue().strip()
         if value.startswith('DNI') or value in ['DNI', 'DNP', 'LOGO', 'mousebite', 'inf']:
             continue
-        elif component.getField("DNI") or component.getField("DNP"):
+        elif component.getField("DNI") or component.getField("DNP") or component.getField("dnp"):
             continue
 
         refs += component.getRef() + ", "
