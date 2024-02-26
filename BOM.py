@@ -241,11 +241,13 @@ for group in grouped:
     filtered_group = []
     for component in group:
 
-        # Skip DNI parts
+        # Skip DNI parts based on value prefix
         value = component.getValue().strip()
         if value.startswith('DNI') or value in ['DNI', 'DNP', 'LOGO', 'mousebite', 'inf']:
             continue
-        elif component.getField("DNI") or component.getField("DNP") or component.getField("dnp"):
+
+        # Skip DNI parts if non-empty DNI/DNP field or 'dnp' property (KiCad7+) is found
+        elif component.getDNP() or component.getField("DNI") or component.getField("DNP") or component.getField("dnp"):
             continue
 
         refs += component.getRef() + ", "

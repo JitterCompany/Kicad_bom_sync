@@ -393,6 +393,17 @@ class comp():
                 fieldNames.append( f.get('field','name') )
         return fieldNames
 
+    def getDNP(self):
+        """Return true if the component has the DNP property set"""
+        for child in self.element.getChildren("property"):
+            try:
+                if child.attributes['name'] == 'dnp':
+                    return True
+            except KeyError:
+                continue
+        return False
+
+
     def getRef(self):
         return self.element.get("comp", "ref")
 
