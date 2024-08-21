@@ -35,7 +35,7 @@ net = netlist_reader.netlist(sys.argv[1])
 xlsfile = sys.argv[2] + '.xlsx'
 
 
-header_names = ['Ref', 'Footprint', 'Value', 'Rating', 'Qty', 'MPN', 'Farnell', 'Mouser', 'Digikey']
+header_names = ['Ref', 'Footprint', 'Value', 'Rating', 'Qty', 'Manufacturer', 'MPN', 'Farnell', 'Mouser', 'Digikey']
 
 # Get all of the components in groups of matching value + footprint
 
@@ -117,7 +117,10 @@ if 'Sync' in col_lookup:
     for r in range(sheet.max_row)[1:]:
         row_no = r+1
         cell = sheet.cell(column=col_no, row=row_no)
-        cell.value = None
+        try:
+            cell.value = None
+        except:
+            pass
         cell.fill = none_fill
 else:
     print("WARNING: xls file {} does not have a 'Sync' column."
@@ -280,6 +283,7 @@ for group in grouped:
     part['Description'] = c.getDescription()
     part['Rating'] = ratings
     part['MPN'] = c.getField("MPN")
+    part['Manufacturer'] = c.getField("Manufacturer")
     part['Farnell'] = c.getField("Farnell")
     part['Mouser'] = c.getField("Mouser")
     part['Digikey'] = c.getField("Digikey")
